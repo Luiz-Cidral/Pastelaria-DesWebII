@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Prato
+
+
+@admin.register(Prato)
+class PratoAdmin(admin.ModelAdmin):
+    list_display = ("id", "nome", "preco")
+    search_fields = ("nome",)
