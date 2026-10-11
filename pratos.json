@@ -1,34 +1,98 @@
 [
-    {
-        "model": "pratos.prato",
-        "pk": 1,
-        "fields": {
-            "nome": "Pastel de Carne",
-            "preco": "8.50"
-        }
-    },
-    {
-        "model": "pratos.prato",
-        "pk": 2,
-        "fields": {
-            "nome": "Pastel de Frango",
-            "preco": "8.00"
-        }
-    },
-    {
-        "model": "pratos.prato",
-        "pk": 3,
-        "fields": {
-            "nome": "Pastel de Queijo",
-            "preco": "7.50"
-        }
-    },
-    {
-        "model": "pratos.prato",
-        "pk": 4,
-        "fields": {
-            "nome": "Pastel de Calabresa",
-            "preco": "8.00"
-        }
+{
+    "model": "pratos.prato",
+    "pk": 1,
+    "fields": {
+        "nome": "Pastel de Carne",
+        "preco": "9.00"
     }
+},
+{
+    "model": "pratos.prato",
+    "pk": 2,
+    "fields": {
+        "nome": "Pastel de Frango",
+        "preco": "8.50"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 4,
+    "fields": {
+        "nome": "Pastel de Calabresa",
+        "preco": "8.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 5,
+    "fields": {
+        "nome": "Pastel de Palmito",
+        "preco": "7.50"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 7,
+    "fields": {
+        "nome": "Pastel de Camar�o",
+        "preco": "15.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 8,
+    "fields": {
+        "nome": "Pastel de Bacon",
+        "preco": "8.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 9,
+    "fields": {
+        "nome": "Pastel de Chocolate",
+        "preco": "8.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 10,
+    "fields": {
+        "nome": "Pastel de Kinder",
+        "preco": "8.50"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 11,
+    "fields": {
+        "nome": "Pastel de Banana com Doce de Leite",
+        "preco": "8.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 12,
+    "fields": {
+        "nome": "Caldo de Cana 300ml",
+        "preco": "4.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 13,
+    "fields": {
+        "nome": "Caldo de Cana 500ml",
+        "preco": "6.00"
+    }
+},
+{
+    "model": "pratos.prato",
+    "pk": 14,
+    "fields": {
+        "nome": "Água Mineral 500ml",
+        "preco": "3.00"
+    }
+}
 ]
