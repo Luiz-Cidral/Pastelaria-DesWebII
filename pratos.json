@@ -1,0 +1,34 @@
+[
+    {
+        "model": "pratos.prato",
+        "pk": 1,
+        "fields": {
+            "nome": "Pastel de Carne",
+            "preco": "8.50"
+        }
+    },
+    {
+        "model": "pratos.prato",
+        "pk": 2,
+        "fields": {
+            "nome": "Pastel de Frango",
+            "preco": "8.00"
+        }
+    },
+    {
+        "model": "pratos.prato",
+        "pk": 3,
+        "fields": {
+            "nome": "Pastel de Queijo",
+            "preco": "7.50"
+        }
+    },
+    {
+        "model": "pratos.prato",
+        "pk": 4,
+        "fields": {
+            "nome": "Pastel de Calabresa",
+            "preco": "8.00"
+        }
+    }
+]
