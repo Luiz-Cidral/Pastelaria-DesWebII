@@ -1,10 +1,49 @@
 [
 {
+    "model": "pratos.ingrediente",
+    "pk": 1,
+    "fields": {
+        "nome": "Massa de Pastel",
+        "estoque": "10.00"
+    }
+},
+{
+    "model": "pratos.ingrediente",
+    "pk": 2,
+    "fields": {
+        "nome": "Carne",
+        "estoque": "5.00"
+    }
+},
+{
+    "model": "pratos.ingrediente",
+    "pk": 3,
+    "fields": {
+        "nome": "Frango",
+        "estoque": "3.00"
+    }
+},
+{
+    "model": "pratos.ingrediente",
+    "pk": 4,
+    "fields": {
+        "nome": "Chocolate",
+        "estoque": "10.00"
+    }
+},
+{
     "model": "pratos.prato",
     "pk": 1,
     "fields": {
         "nome": "Pastel de Carne",
-        "preco": "9.00"
+        "preco": "9.00",
+        "disponivel": true,
+        "descricao": "",
+        "categoria": "tradicional",
+        "ingredientes": [
+            1,
+            2
+        ]
     }
 },
 {
@@ -12,7 +51,11 @@
     "pk": 2,
     "fields": {
         "nome": "Pastel de Frango",
-        "preco": "8.50"
+        "preco": "8.50",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
@@ -20,7 +63,11 @@
     "pk": 4,
     "fields": {
         "nome": "Pastel de Calabresa",
-        "preco": "8.00"
+        "preco": "8.00",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
@@ -28,7 +75,13 @@
     "pk": 5,
     "fields": {
         "nome": "Pastel de Palmito",
-        "preco": "7.50"
+        "preco": "7.50",
+        "disponivel": true,
+        "descricao": "",
+        "categoria": "vegetariano",
+        "ingredientes": [
+            1
+        ]
     }
 },
 {
@@ -36,7 +89,11 @@
     "pk": 7,
     "fields": {
         "nome": "Pastel de Camar�o",
-        "preco": "15.00"
+        "preco": "15.00",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
@@ -44,7 +101,11 @@
     "pk": 8,
     "fields": {
         "nome": "Pastel de Bacon",
-        "preco": "8.00"
+        "preco": "8.00",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
@@ -52,7 +113,11 @@
     "pk": 9,
     "fields": {
         "nome": "Pastel de Chocolate",
-        "preco": "8.00"
+        "preco": "8.00",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
@@ -60,7 +125,14 @@
     "pk": 10,
     "fields": {
         "nome": "Pastel de Kinder",
-        "preco": "8.50"
+        "preco": "8.50",
+        "disponivel": true,
+        "descricao": "",
+        "categoria": "doce",
+        "ingredientes": [
+            1,
+            4
+        ]
     }
 },
 {
@@ -68,31 +140,29 @@
     "pk": 11,
     "fields": {
         "nome": "Pastel de Banana com Doce de Leite",
-        "preco": "8.00"
+        "preco": "8.00",
+        "disponivel": true,
+        "descricao": null,
+        "categoria": "tradicional",
+        "ingredientes": []
     }
 },
 {
-    "model": "pratos.prato",
-    "pk": 12,
-    "fields": {
-        "nome": "Caldo de Cana 300ml",
-        "preco": "4.00"
-    }
-},
-{
-    "model": "pratos.prato",
-    "pk": 13,
+    "model": "pratos.bebida",
+    "pk": 1,
     "fields": {
         "nome": "Caldo de Cana 500ml",
-        "preco": "6.00"
+        "preco": "6.00",
+        "estoque": 3
     }
 },
 {
-    "model": "pratos.prato",
-    "pk": 14,
+    "model": "pratos.bebida",
+    "pk": 2,
     "fields": {
-        "nome": "Água Mineral 500ml",
-        "preco": "3.00"
+        "nome": "Coca-Cola 600ml",
+        "preco": "6.99",
+        "estoque": 10
     }
 }
 ]
