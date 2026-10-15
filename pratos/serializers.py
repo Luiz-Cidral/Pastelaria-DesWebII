@@ -38,15 +38,26 @@ class PratoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("O preço deve ser maior que zero.")
         return value
 
-    def validate_estoque(self, value):
-        if value < 0:
-            raise serializers.ValidationError("O estoque não pode ser negativo.")
-        return value
-
     def validate_descricao(self, value):
         if value is not None and len(value.strip()) > 500:
             raise serializers.ValidationError("A descrição não pode ultrapassar 500 caracteres.")
         return value
+
+    def validate_disponivel(self, data):
+        disponivel = data.get('disponivel', getattr(self.instance, 'disponivel', True))
+        ingredientes = data.get('ingredientes', getattr(self.instance, 'ingredientes', []))
+
+        if hasattr(ingredientes, 'all'): 
+            ingredientes = ingredientes.all()
+
+        if disponivel:
+            for ingrediente in ingredientes:
+                if ingrediente.quantidade_estoque <= 0:
+                    raise serializers.ValidationError({
+                        "disponivel": f"O pastel não pode ficar disponível, pois o ingrediente '{ingrediente.nome}' está sem estoque."
+                    })
+
+        return data
 
 class BebidaSeriaizer(serializers.ModelSerializer):
     class Meta:
