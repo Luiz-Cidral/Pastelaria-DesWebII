@@ -61,6 +61,7 @@ class Pedido(models.Model):
 
     data = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDENTE)
+    estoque_baixado = models.BooleanField(default=False, editable=False)
 
     def __str__(self):
         return f"Pedido #{self.pk} - {self.get_status_display()}"
@@ -85,3 +86,5 @@ class ItemPedido(models.Model):
     def __str__(self):
         produto = self.prato or self.bebida
         return f"{self.quantidade} x {produto} no pedido #{self.pedido_id}"
+
+

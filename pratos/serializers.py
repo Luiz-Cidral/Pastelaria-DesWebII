@@ -1,9 +1,11 @@
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from rest_framework import serializers
 
 from .models import Bebida, Ingrediente, ItemPedido, Pedido, Prato
+from .services import baixar_estoque_pedido
 
 
 class IngredienteSerializer(serializers.ModelSerializer):
@@ -83,12 +85,9 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
         bebida = attrs.get("bebida")
         if (prato is None) == (bebida is None):
             raise serializers.ValidationError("Informe exatamente um produto: prato ou bebida.")
+        if prato is not None and not prato.disponivel:
+            raise serializers.ValidationError({"prato": "Este prato está indisponível no momento."})
         return attrs
-
-    def create(self, validated_data):
-        produto = validated_data.get("prato") or validated_data.get("bebida")
-        validated_data["preco_unitario"] = produto.preco
-        return super().create(validated_data)
 
 
 class PedidoSerializer(serializers.ModelSerializer):
@@ -107,15 +106,33 @@ class PedidoSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         itens_data = validated_data.pop("itens")
+        status = validated_data.pop("status", Pedido.Status.PENDENTE)
         pedido = Pedido.objects.create(**validated_data)
         for item_data in itens_data:
             produto = item_data.get("prato") or item_data.get("bebida")
             ItemPedido.objects.create(pedido=pedido, preco_unitario=produto.preco, **item_data)
+        if status != Pedido.Status.PENDENTE:
+            pedido.status = status
+            pedido.save(update_fields=("status",))
+        if pedido.status == Pedido.Status.PRONTO:
+            try:
+                pedido = baixar_estoque_pedido(pedido)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError(exc.message_dict if hasattr(exc, "message_dict") else exc.messages) from exc
         return pedido
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if "itens" in validated_data:
             raise serializers.ValidationError({"itens": "Os itens do pedido não podem ser alterados depois da criação."})
-        return super().update(instance, validated_data)
-
+        pedido = Pedido.objects.select_for_update().get(pk=instance.pk)
+        for campo, valor in validated_data.items():
+            setattr(pedido, campo, valor)
+        pedido.save()
+        if pedido.status == Pedido.Status.PRONTO:
+            try:
+                pedido = baixar_estoque_pedido(pedido)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError(exc.message_dict if hasattr(exc, "message_dict") else exc.messages) from exc
+        return pedido
 
