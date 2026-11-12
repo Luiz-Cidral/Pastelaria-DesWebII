@@ -1,17 +1,16 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from pratos.views import PratoViewSet
-
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from pratos.views import BebidaViewSet, IngredienteViewSet, ItemPedidoViewSet, PedidoViewSet, PratoViewSet
 
 router = DefaultRouter()
 router.register("pratos", PratoViewSet, basename="prato")
+router.register("ingredientes", IngredienteViewSet, basename="ingrediente")
+router.register("bebidas", BebidaViewSet, basename="bebida")
+router.register("pedidos", PedidoViewSet, basename="pedido")
+router.register("itens-pedido", ItemPedidoViewSet, basename="item-pedido")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

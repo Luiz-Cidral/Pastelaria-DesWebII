@@ -1,11 +1,18 @@
 from django.contrib import admin
 
-from .models import Prato, Ingrediente, Bebida, ReceitaIngrediente
+from .models import Bebida, Ingrediente, ItemPedido, Pedido, Prato, ReceitaIngrediente
 
 
 class ReceitaIngredienteInline(admin.TabularInline):
     model = ReceitaIngrediente
     extra = 1
+
+
+class ItemPedidoInline(admin.TabularInline):
+    model = ItemPedido
+    extra = 0
+    readonly_fields = ("preco_unitario",)
+
 
 @admin.register(Prato)
 class PratoAdmin(admin.ModelAdmin):
@@ -27,3 +34,11 @@ class BebidaAdmin(admin.ModelAdmin):
     list_display = ("id", "nome", "preco", "estoque")
     search_fields = ("nome",)
     list_filter = ("estoque",)
+
+
+@admin.register(Pedido)
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ("id", "data", "status")
+    list_filter = ("status",)
+    readonly_fields = ("data",)
+    inlines = [ItemPedidoInline]
