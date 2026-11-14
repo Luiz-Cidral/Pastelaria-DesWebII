@@ -1,0 +1,290 @@
+/* ---------- GERAL ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7ef;
+    color: #303b32;
+}
+
+/* ---------- MENU ---------- */
+
+.cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #31594d;
+    padding: 0 6%;
+}
+
+.marca {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+}
+
+nav li {
+    margin: 0 25px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+nav a:hover,
+.atual a {
+    color: #f2c66d;
+}
+
+.atual a {
+    border-bottom: 3px solid #f2c66d;
+    padding-bottom: 5px;
+}
+
+/* ---------- BANNER ---------- */
+
+.banner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    align-items: center;
+    gap: 30px;
+    width: 90%;
+    margin: auto;
+    padding: 45px 20px 40px;
+}
+
+.banner-texto {
+    text-align: left;
+}
+
+.banner h1 {
+    margin: 0;
+    font-size: 48px;
+    color: #31594d;
+}
+
+.banner span {
+    display: block;
+    color: #bf713e;
+    font-size: 54px;
+    font-weight: bold;
+}
+
+.banner p {
+    font-size: 20px;
+    margin: 15px 0 25px;
+    color: #50564f;
+}
+
+.banner img {
+    display: block;
+    width: auto;
+    height: 480px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+/* ---------- BOTÃO ---------- */
+
+.botao {
+    display: inline-block;
+    background: #477563;
+    color: white;
+    text-decoration: none;
+    padding: 13px 25px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.botao:hover {
+    background: #25483d;
+}
+
+/* ---------- PRODUTOS ---------- */
+
+.white-itens {
+    width: 90%;
+    margin: 25px auto 55px;
+    text-align: center;
+}
+
+.white-itens h2,
+.sobre h2 {
+    color: #31594d;
+    font-size: 32px;
+}
+
+.white-itens ul {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    list-style: none;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+/* ---------- CARD ---------- */
+
+.white-itens li {
+    background: white;
+    width: 250px;
+    padding: 22px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .12);
+    transition: .3s;
+}
+
+.white-itens li:hover {
+    transform: translateY(-5px);
+}
+
+.imagem-prato {
+    display: grid;
+    height: 100px;
+    place-items: center;
+    background: #f4f7ef;
+    border-radius: 10px;
+    font-size: 60px;
+}
+
+.white-itens h3 {
+    color: #31594d;
+    font-size: 22px;
+}
+
+.white-itens .descricao {
+    min-height: 42px;
+    color: #596159;
+    line-height: 1.4;
+}
+
+.white-itens strong {
+    display: block;
+    margin-top: 15px;
+    color: #bf713e;
+    font-size: 20px;
+}
+
+.mensagem {
+    font-size: 18px;
+    color: #50564f;
+}
+
+/* ---------- SOBRE ---------- */
+
+.sobre {
+    padding: 40px 20px 55px;
+    background: white;
+    text-align: center;
+}
+
+.sobre p {
+    max-width: 650px;
+    margin: auto;
+    color: #50564f;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* ---------- RODAPÉ ---------- */
+
+.rodape {
+    padding: 20px;
+    background: #31594d;
+    color: white;
+    text-align: center;
+}
+
+/* ---------- RESPONSIVO ---------- */
+
+@media (max-width: 900px) {
+    .cabecalho {
+        flex-direction: column;
+        padding: 15px 10px 0;
+    }
+
+    .marca {
+        margin-top: 5px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        padding: 18px 0;
+    }
+
+    nav li {
+        margin: 8px 15px;
+    }
+
+    .banner h1 {
+        font-size: 40px;
+    }
+
+    .banner span {
+        font-size: 44px;
+    }
+}
+
+@media (max-width: 850px) {
+    .banner {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+
+    .banner-texto {
+        text-align: center;
+    }
+
+    .banner img {
+        height: 420px;
+        max-width: min(100%, 340px);
+    }
+}
+@media (max-width: 500px) {
+    .banner h1 {
+        font-size: 34px;
+    }
+
+    .banner span {
+        font-size: 38px;
+    }
+
+    .banner p {
+        font-size: 17px;
+    }
+
+    .banner img {
+        width: auto;
+        height: 360px;
+        max-width: min(100%, 340px);
+    }
+}
+
+
+
+
+
