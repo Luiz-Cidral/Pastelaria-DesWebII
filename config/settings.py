@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-$-e$*d5jf54rce&*uw2nd$wj@con6t+35)sbzb=y02t2g$p7jb
 DEBUG = True
 
 ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 
 # Application definition
@@ -46,9 +47,13 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": [
-    "django_filters.rest_framework.DjangoFilterBackend",]
-    ,"DEFAULT_PAGINATION_CLASS": "pratos.pagination.PratoPagination",
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "pratos.pagination.PratoPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -143,3 +148,4 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+

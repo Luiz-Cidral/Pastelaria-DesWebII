@@ -31,6 +31,9 @@ body {
     font-weight: bold;
 }
 
+.cabecalho a.marca {
+    text-decoration: none;
+}
 nav ul {
     display: flex;
     justify-content: center;
@@ -230,7 +233,10 @@ nav a:hover,
         margin-top: 5px;
     }
 
-    nav ul {
+    .cabecalho a.marca {
+    text-decoration: none;
+}
+nav ul {
         flex-wrap: wrap;
         padding: 18px 0;
     }
@@ -288,3 +294,623 @@ nav a:hover,
 
 
 
+
+/* ---------- PÁGINA DO CARDÁPIO ---------- */
+
+.pagina-cardapio {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+    padding: 45px 0 60px;
+}
+
+.titulo-cardapio {
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.titulo-cardapio .sobretitulo {
+    margin-bottom: 8px;
+    color: #bf713e;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.titulo-cardapio h1 {
+    margin: 0 0 10px;
+    color: #31594d;
+    font-size: 42px;
+}
+
+.titulo-cardapio > p:last-child {
+    color: #50564f;
+}
+
+.conteudo-cardapio {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+    gap: 30px;
+}
+
+.grupo-produtos {
+    margin-bottom: 38px;
+}
+
+.grupo-produtos h2,
+.resumo-pedido h2 {
+    color: #31594d;
+}
+
+.grade-produtos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.produto-card {
+    overflow: hidden;
+    border-radius: 14px;
+    background: white;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+}
+
+.produto-card > img,
+.imagem-bebida {
+    display: grid;
+    width: 100%;
+    height: 190px;
+    place-items: center;
+    background: #e8eee5;
+}
+
+.produto-card > img {
+    object-fit: contain;
+    background: #f4f7ef;
+    object-position: center 55%;
+}
+
+.imagem-bebida {
+    font-size: 72px;
+}
+
+.produto-informacoes {
+    padding: 18px;
+}
+
+.produto-categoria {
+    color: #bf713e;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.produto-informacoes h3 {
+    margin: 8px 0;
+    color: #31594d;
+    font-size: 20px;
+}
+
+.produto-informacoes p {
+    min-height: 38px;
+    color: #596159;
+    font-size: 14px;
+}
+
+.produto-informacoes > strong {
+    color: #bf713e;
+    font-size: 19px;
+}
+
+.produto-indisponivel {
+    display: block;
+    margin-top: 8px;
+    color: #9a4d3b;
+    font-size: 13px;
+}
+
+.controle-quantidade {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 15px;
+}
+
+.controle-quantidade button {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #477563;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.controle-quantidade button:disabled {
+    background: #c7d0c8;
+    cursor: not-allowed;
+}
+
+.resumo-pedido {
+    position: sticky;
+    top: 20px;
+    padding: 22px;
+    border-radius: 14px;
+    background: white;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+}
+
+.resumo-pedido > p {
+    color: #596159;
+}
+
+.resumo-pedido ul {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.resumo-pedido li,
+.resumo-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.resumo-pedido li strong,
+.resumo-total strong {
+    white-space: nowrap;
+}
+
+.pedido-vazio {
+    padding: 15px 0;
+    font-size: 14px;
+}
+
+.resumo-total {
+    margin: 20px 0;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8e1;
+    font-size: 17px;
+}
+
+.botao-finalizar {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+}
+
+.botao-finalizar:disabled {
+    background: #aebdb3;
+    cursor: not-allowed;
+}
+
+.mensagem-pedido {
+    margin: 14px 0 0;
+    color: #31594d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.mensagem-erro {
+    text-align: center;
+}
+
+@media (max-width: 850px) {
+    .conteudo-cardapio {
+        grid-template-columns: 1fr;
+    }
+
+    .resumo-pedido {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .grade-produtos {
+        grid-template-columns: 1fr;
+    }
+
+    .titulo-cardapio h1 {
+        font-size: 34px;
+    }
+}
+
+
+
+
+/* ---------- PAINEL ADMINISTRATIVO ---------- */
+
+.admin-login-pagina {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 60px 20px;
+}
+
+.admin-login {
+    display: grid;
+    width: min(420px, 100%);
+    gap: 12px;
+    padding: 32px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .12);
+}
+
+.admin-login-pagina > .admin-voltar {
+    position: absolute;
+    top: 25px;
+    left: 6%;
+}
+
+.admin-selo {
+    display: grid;
+    width: 50px;
+    height: 50px;
+    place-items: center;
+    border-radius: 15px;
+    background: #31594d;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.admin-legenda {
+    margin: 5px 0;
+    color: #bf713e;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.admin-login h1,
+.admin-cabecalho h1 {
+    margin: 0;
+    color: #31594d;
+    font-size: 30px;
+}
+
+.admin-login > p:not(.admin-legenda) {
+    color: #596159;
+    line-height: 1.5;
+}
+
+.admin-login label,
+.admin-formulario label {
+    color: #303b32;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.admin-login input,
+.admin-formulario input,
+.admin-formulario select,
+.admin-formulario textarea,
+.admin-status-pedido select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #cdd8cd;
+    border-radius: 7px;
+    background: white;
+    color: #303b32;
+    font: inherit;
+}
+
+.admin-formulario textarea {
+    resize: vertical;
+}
+
+.admin-botao {
+    width: 100%;
+    margin-top: 8px;
+    border: 0;
+    cursor: pointer;
+}
+
+.admin-botao:disabled,
+.botao-salvar:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
+.admin-voltar {
+    color: #31594d;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.pagina-admin {
+    width: min(1240px, 92%);
+    min-height: 80vh;
+    margin: 0 auto;
+    padding: 35px 0 70px;
+}
+
+.admin-cabecalho,
+.admin-acoes-topo,
+.admin-titulo-lista,
+.admin-pedido-topo,
+.admin-status-pedido,
+.admin-botoes-formulario,
+.admin-receita-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.admin-cabecalho {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dce5dc;
+}
+
+.admin-cabecalho h1 {
+    margin-bottom: 5px;
+}
+
+.admin-cabecalho > div:first-child > p:last-child {
+    margin: 0;
+    color: #596159;
+}
+
+.botao-sair,
+.botao-editar,
+.botao-cancelar,
+.botao-remover {
+    padding: 9px 13px;
+    border: 1px solid #cdd8cd;
+    border-radius: 7px;
+    background: white;
+    color: #31594d;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.admin-abas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #dce5dc;
+}
+
+.admin-abas button {
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #596159;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.admin-abas button.selecionada {
+    background: #31594d;
+    color: white;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, .85fr) minmax(0, 1.4fr);
+    align-items: start;
+    gap: 25px;
+}
+
+.admin-lista,
+.admin-formulario,
+.admin-pedido {
+    padding: 22px;
+    border: 1px solid #e0e7df;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .06);
+}
+
+.admin-titulo-lista {
+    margin-bottom: 16px;
+}
+
+.admin-titulo-lista h2,
+.admin-formulario h2 {
+    margin: 0;
+    color: #31594d;
+    font-size: 21px;
+}
+
+.botao-pequeno {
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+.admin-registro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid #edf0eb;
+}
+
+.admin-registro > div {
+    display: grid;
+    gap: 5px;
+}
+
+.admin-registro strong {
+    color: #303b32;
+}
+
+.admin-registro span,
+.admin-pedido-topo span {
+    color: #707b70;
+    font-size: 13px;
+}
+
+.admin-formulario {
+    display: grid;
+    gap: 10px;
+}
+
+.admin-formulario h2 {
+    margin-bottom: 8px;
+}
+
+.admin-campos-duplos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.admin-campos-duplos > div {
+    display: grid;
+    gap: 8px;
+}
+
+.admin-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 4px 0 10px;
+}
+
+.admin-checkbox input {
+    width: auto;
+    min-height: auto;
+}
+
+.admin-receita-titulo {
+    margin-top: 10px;
+}
+
+.admin-receita-titulo h3 {
+    margin: 0 0 4px;
+    color: #31594d;
+    font-size: 16px;
+}
+
+.admin-receita-titulo p {
+    margin: 0;
+    color: #707b70;
+    font-size: 12px;
+}
+
+.admin-receita-linha {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 38px;
+    gap: 8px;
+}
+
+.botao-remover {
+    padding: 0;
+    font-size: 20px;
+}
+
+.admin-botoes-formulario {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.botao-salvar {
+    border: 0;
+    cursor: pointer;
+}
+
+.admin-pedidos {
+    display: grid;
+    gap: 15px;
+}
+
+.admin-pedidos > .admin-titulo-lista {
+    margin-bottom: 0;
+}
+
+.admin-pedido-topo > div {
+    display: grid;
+    gap: 5px;
+}
+
+.admin-pedido ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    padding-left: 20px;
+    color: #596159;
+}
+
+.admin-status-pedido {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid #edf0eb;
+}
+
+.admin-status-pedido select {
+    width: auto;
+    min-width: 145px;
+}
+
+.admin-status-pedido small {
+    color: #31594d;
+    font-weight: bold;
+}
+
+.admin-vazio,
+.admin-mensagem {
+    color: #596159;
+}
+
+.admin-mensagem {
+    padding: 12px 15px;
+    border-radius: 8px;
+    background: #edf3ec;
+}
+
+.erro-admin {
+    color: #8c332b;
+    background: #faece9;
+}
+
+.sucesso-admin {
+    color: #31594d;
+}
+
+@media (max-width: 800px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-cabecalho,
+    .admin-acoes-topo,
+    .admin-titulo-lista,
+    .admin-receita-titulo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-receita-linha {
+        grid-template-columns: 1fr 95px 34px;
+    }
+
+    .admin-pedido-topo {
+        align-items: flex-start;
+    }
+
+    .admin-status-pedido {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-status-pedido select {
+        width: 100%;
+    }
+}
