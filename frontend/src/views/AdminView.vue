@@ -16,8 +16,10 @@ const erro = ref('')
 const mensagem = ref('')
 const formularioPrato = ref({})
 const formularioBebida = ref({})
+const formularioIngrediente = ref({})
 const salvandoPrato = ref(false)
 const salvandoBebida = ref(false)
+const salvandoIngrediente = ref(false)
 
 const statusPedidos = [
   { valor: 'pendente', nome: 'Pendente' },
@@ -37,6 +39,10 @@ function novoPrato() {
     disponivel: true,
     receitas: [{ ingrediente: '', quantidade_gramas: '' }],
   }
+}
+
+function novoIngrediente() {
+  formularioIngrediente.value = { id: null, nome: '', estoque: 0 }
 }
 
 function novaBebida() {
@@ -128,10 +134,24 @@ async function carregarPedidos() {
   }
 }
 
+async function carregarIngredientes() {
+  carregando.value = true
+  erro.value = ''
+
+  try {
+    const dados = await requisicao('/api/ingredientes/?page_size=100')
+    ingredientes.value = resultados(dados)
+  } catch (falha) {
+    erro.value = `Não foi possível carregar os ingredientes: ${falha.message}`
+  } finally {
+    carregando.value = false
+  }
+}
 async function selecionarAba(nome) {
   aba.value = nome
   mensagem.value = ''
   if (nome === 'pedidos' && usuario.value) await carregarPedidos()
+  if (nome === 'ingredientes' && usuario.value) await carregarIngredientes()
 }
 async function verificarSessao() {
   carregando.value = true
@@ -283,6 +303,36 @@ async function salvarBebida() {
   }
 }
 
+function editarIngrediente(ingrediente) {
+  formularioIngrediente.value = { ...ingrediente }
+  mensagem.value = ''
+}
+
+async function salvarIngrediente() {
+  erro.value = ''
+  mensagem.value = ''
+  salvandoIngrediente.value = true
+  const ingrediente = formularioIngrediente.value
+
+  try {
+    const dados = {
+      nome: ingrediente.nome,
+      estoque: Number(ingrediente.estoque),
+    }
+    const url = ingrediente.id ? `/api/ingredientes/${ingrediente.id}/` : '/api/ingredientes/'
+    await requisicao(url, {
+      method: ingrediente.id ? 'PATCH' : 'POST',
+      body: JSON.stringify(dados),
+    })
+    await carregarDados()
+    novoIngrediente()
+    mensagem.value = 'Estoque do ingrediente atualizado.'
+  } catch (falha) {
+    erro.value = falha.message
+  } finally {
+    salvandoIngrediente.value = false
+  }
+}
 function nomeItemPedido(item) {
   if (item.prato) return pratos.value.find((prato) => prato.id === item.prato)?.nome || 'Prato'
   return bebidas.value.find((bebida) => bebida.id === item.bebida)?.nome || 'Bebida'
@@ -315,6 +365,7 @@ async function salvarStatus(pedido) {
 
 novoPrato()
 novaBebida()
+novoIngrediente()
 onMounted(verificarSessao)
 </script>
 
@@ -355,6 +406,7 @@ onMounted(verificarSessao)
 
     <nav class="admin-abas" aria-label="Seções administrativas">
       <button :class="{ selecionada: aba === 'pratos' }" type="button" @click="selecionarAba('pratos')">Pratos</button>
+      <button :class="{ selecionada: aba === 'ingredientes' }" type="button" @click="selecionarAba('ingredientes')">Ingredientes</button>
       <button :class="{ selecionada: aba === 'bebidas' }" type="button" @click="selecionarAba('bebidas')">Bebidas</button>
       <button :class="{ selecionada: aba === 'pedidos' }" type="button" @click="selecionarAba('pedidos')">Pedidos</button>
     </nav>
@@ -430,6 +482,37 @@ onMounted(verificarSessao)
       </form>
     </section>
 
+    <section v-if="aba === 'ingredientes' && !carregando" class="admin-layout">
+      <div class="admin-lista">
+        <div class="admin-titulo-lista">
+          <h2>Ingredientes cadastrados</h2>
+          <button class="botao botao-pequeno" type="button" @click="novoIngrediente">Novo ingrediente</button>
+        </div>
+        <article v-for="ingrediente in ingredientes" :key="ingrediente.id" class="admin-registro">
+          <div>
+            <strong>{{ ingrediente.nome }}</strong>
+            <span>{{ ingrediente.estoque }} g em estoque</span>
+          </div>
+          <button class="botao-editar" type="button" @click="editarIngrediente(ingrediente)">Editar estoque</button>
+        </article>
+        <p v-if="ingredientes.length === 0" class="admin-vazio">Nenhum ingrediente cadastrado.</p>
+      </div>
+
+      <form class="admin-formulario" @submit.prevent="salvarIngrediente">
+        <h2>{{ formularioIngrediente.id ? 'Atualizar ingrediente' : 'Cadastrar ingrediente' }}</h2>
+        <label for="ingrediente-nome">Nome</label>
+        <input id="ingrediente-nome" v-model="formularioIngrediente.nome" required />
+        <label for="ingrediente-estoque">Estoque disponível (g)</label>
+        <input id="ingrediente-estoque" v-model="formularioIngrediente.estoque" type="number" min="0" step="0.01" required />
+        <p class="admin-ajuda-estoque">O estoque é informado em gramas e usado para controlar a disponibilidade dos pratos.</p>
+        <div class="admin-botoes-formulario">
+          <button class="botao botao-salvar" type="submit" :disabled="salvandoIngrediente">
+            {{ salvandoIngrediente ? 'Salvando...' : 'Salvar ingrediente' }}
+          </button>
+          <button class="botao-cancelar" type="button" @click="novoIngrediente">Limpar formulário</button>
+        </div>
+      </form>
+    </section>
     <section v-if="aba === 'bebidas' && !carregando" class="admin-layout">
       <div class="admin-lista">
         <div class="admin-titulo-lista">
@@ -493,5 +576,7 @@ onMounted(verificarSessao)
     </section>
   </main>
 </template>
+
+
 
 

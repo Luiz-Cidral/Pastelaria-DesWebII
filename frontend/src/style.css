@@ -812,6 +812,12 @@ nav ul {
     font-size: 20px;
 }
 
+.admin-ajuda-estoque {
+    margin: 0 0 8px;
+    color: #707b70;
+    font-size: 13px;
+    line-height: 1.5;
+}
 .admin-botoes-formulario {
     justify-content: flex-start;
     flex-wrap: wrap;
@@ -914,3 +920,5 @@ nav ul {
         width: 100%;
     }
 }
+
+
