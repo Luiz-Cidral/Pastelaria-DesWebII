@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const usuario = ref('')
@@ -8,6 +8,12 @@ const nomeLogin = ref('')
 const senhaLogin = ref('')
 const aba = ref('pratos')
 const pratos = ref([])
+const filtroDisponibilidade = ref('todos')
+const pratosFiltrados = computed(() => {
+  if (filtroDisponibilidade.value === 'disponiveis') return pratos.value.filter((prato) => prato.disponivel)
+  if (filtroDisponibilidade.value === 'indisponiveis') return pratos.value.filter((prato) => !prato.disponivel)
+  return pratos.value
+})
 const bebidas = ref([])
 const ingredientes = ref([])
 const pedidos = ref([])
@@ -419,15 +425,21 @@ onMounted(verificarSessao)
       <div class="admin-lista">
         <div class="admin-titulo-lista">
           <h2>Pratos cadastrados</h2>
+          <select v-model="filtroDisponibilidade" class="admin-filtro-disponibilidade" aria-label="Filtrar pratos por disponibilidade">
+            <option value="todos">Todos</option>
+            <option value="disponiveis">Disponíveis</option>
+            <option value="indisponiveis">Indisponíveis</option>
+          </select>
           <button class="botao botao-pequeno" type="button" @click="novoPrato">Novo prato</button>
         </div>
-        <article v-for="prato in pratos" :key="prato.id" class="admin-registro">
+        <article v-for="prato in pratosFiltrados" :key="prato.id" class="admin-registro">
           <div>
             <strong>{{ prato.nome }}</strong>
             <span>{{ prato.categoria }} · {{ prato.disponivel ? 'Disponível' : 'Indisponível' }}</span>
           </div>
           <button class="botao-editar" type="button" @click="editarPrato(prato)">Editar</button>
         </article>
+        <p v-if="pratosFiltrados.length === 0" class="admin-vazio">Nenhum prato corresponde a este filtro.</p>
       </div>
 
       <form class="admin-formulario" @submit.prevent="salvarPrato">
@@ -576,6 +588,9 @@ onMounted(verificarSessao)
     </section>
   </main>
 </template>
+
+
+
 
 
 

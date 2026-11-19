@@ -1,6 +1,9 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref, watch } from 'vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 
 const pratos = ref([])
 const bebidas = ref([])
@@ -9,12 +12,26 @@ const carregando = ref(true)
 const erro = ref('')
 const enviandoPedido = ref(false)
 const mensagemPedido = ref('')
+const busca = ref('')
+const categoria = ref('')
+const ordenacao = ref('nome')
 
 async function carregarCardapio() {
+  carregando.value = true
+  erro.value = ''
+
+  const parametrosPratos = new URLSearchParams({ page_size: '100', ordering: ordenacao.value })
+  const parametrosBebidas = new URLSearchParams({ page_size: '100', estoque_minimo: '1', ordering: ordenacao.value })
+  if (busca.value.trim()) {
+    parametrosPratos.set('search', busca.value.trim())
+    parametrosBebidas.set('search', busca.value.trim())
+  }
+  if (categoria.value) parametrosPratos.set('categoria', categoria.value)
+
   try {
     const [respostaPratos, respostaBebidas] = await Promise.all([
-      fetch('/api/pratos/'),
-      fetch('/api/bebidas/'),
+      fetch(`/api/pratos/?${parametrosPratos}`),
+      fetch(`/api/bebidas/?${parametrosBebidas}`),
     ])
 
     if (!respostaPratos.ok || !respostaBebidas.ok) {
@@ -112,7 +129,28 @@ async function finalizarPedido() {
   }
 }
 
-onMounted(carregarCardapio)
+function atualizarUrl() {
+  const query = {}
+  if (busca.value.trim()) query.search = busca.value.trim()
+  if (categoria.value) query.categoria = categoria.value
+  if (ordenacao.value !== 'nome') query.ordering = ordenacao.value
+  router.replace({ path: '/cardapio', query })
+}
+
+function limparFiltros() {
+  router.replace({ path: '/cardapio', query: {} })
+}
+
+watch(
+  () => route.query,
+  (query) => {
+    busca.value = typeof query.search === 'string' ? query.search : ''
+    categoria.value = typeof query.categoria === 'string' ? query.categoria : ''
+    ordenacao.value = typeof query.ordering === 'string' ? query.ordering : 'nome'
+    carregarCardapio()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -139,7 +177,37 @@ onMounted(carregarCardapio)
     <p v-if="carregando" class="mensagem">Carregando o cardápio...</p>
     <p v-else-if="erro" class="mensagem mensagem-erro">{{ erro }}</p>
 
-    <div v-else class="conteudo-cardapio">
+    <form v-else class="filtros-cardapio" @submit.prevent="atualizarUrl">
+      <label class="campo-busca">
+        <span>Pesquisar no cardápio</span>
+        <input v-model="busca" type="search" placeholder="Ex.: queijo, carne, suco..." />
+      </label>
+      <label>
+        <span>Categoria dos pastéis</span>
+        <select v-model="categoria">
+          <option value="">Todas</option>
+          <option value="tradicional">Tradicional</option>
+          <option value="especial">Especial</option>
+          <option value="doce">Doce</option>
+          <option value="vegetariano">Vegetariano</option>
+        </select>
+      </label>
+      <label>
+        <span>Ordenar por</span>
+        <select v-model="ordenacao">
+          <option value="nome">Nome: A–Z</option>
+          <option value="-nome">Nome: Z–A</option>
+          <option value="preco">Menor preço</option>
+          <option value="-preco">Maior preço</option>
+        </select>
+      </label>
+      <div class="acoes-filtro">
+        <button class="botao botao-finalizar" type="submit">Pesquisar</button>
+        <button class="botao-limpar-filtros" type="button" @click="limparFiltros">Limpar</button>
+      </div>
+    </form>
+
+    <div v-if="!carregando && !erro" class="conteudo-cardapio">
       <div class="lista-cardapio">
         <section class="grupo-produtos">
           <h2>Pastéis</h2>
@@ -160,7 +228,7 @@ onMounted(carregarCardapio)
               </div>
             </article>
           </div>
-          <p v-if="pratos.length === 0" class="mensagem">Nenhum prato cadastrado.</p>
+          <p v-if="pratos.length === 0" class="mensagem">Nenhum pastel encontrado com esses filtros.</p>
         </section>
 
         <section class="grupo-produtos">
@@ -181,7 +249,7 @@ onMounted(carregarCardapio)
               </div>
             </article>
           </div>
-          <p v-if="bebidas.length === 0" class="mensagem">Nenhuma bebida cadastrada.</p>
+          <p v-if="bebidas.length === 0" class="mensagem">Nenhuma bebida encontrada com esses filtros.</p>
         </section>
       </div>
 
@@ -209,6 +277,12 @@ onMounted(carregarCardapio)
 
   <footer class="rodape">Pastel Mania — feito com carinho.</footer>
 </template>
+
+
+
+
+
+
 
 
 

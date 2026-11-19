@@ -326,6 +326,59 @@ nav ul {
     color: #50564f;
 }
 
+.filtros-cardapio {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr) minmax(150px, 1fr) auto;
+    align-items: end;
+    gap: 14px;
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+}
+
+.filtros-cardapio label {
+    display: grid;
+    gap: 7px;
+    color: #31594d;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filtros-cardapio input,
+.filtros-cardapio select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #cdd8cd;
+    border-radius: 7px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    font-weight: normal;
+}
+
+.acoes-filtro {
+    display: flex;
+    gap: 8px;
+}
+
+.acoes-filtro .botao {
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+.botao-limpar-filtros {
+    min-height: 42px;
+    padding: 9px 13px;
+    border: 1px solid #31594d;
+    border-radius: 7px;
+    background: white;
+    color: #31594d;
+    cursor: pointer;
+}
+
 .conteudo-cardapio {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -500,6 +553,10 @@ nav ul {
 }
 
 @media (max-width: 850px) {
+    .filtros-cardapio {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .conteudo-cardapio {
         grid-template-columns: 1fr;
     }
@@ -510,6 +567,14 @@ nav ul {
 }
 
 @media (max-width: 600px) {
+    .filtros-cardapio {
+        grid-template-columns: 1fr;
+    }
+
+    .acoes-filtro {
+        flex-wrap: wrap;
+    }
+
     .grade-produtos {
         grid-template-columns: 1fr;
     }
@@ -518,9 +583,6 @@ nav ul {
         font-size: 34px;
     }
 }
-
-
-
 
 /* ---------- PAINEL ADMINISTRATIVO ---------- */
 
@@ -729,6 +791,15 @@ nav ul {
     font-size: 13px;
 }
 
+.admin-filtro-disponibilidade {
+    min-height: 38px;
+    padding: 7px 10px;
+    border: 1px solid #cdd8cd;
+    border-radius: 7px;
+    background: white;
+    color: #31594d;
+    font: inherit;
+}
 .admin-registro {
     display: flex;
     align-items: center;
@@ -920,5 +991,9 @@ nav ul {
         width: 100%;
     }
 }
+
+
+
+
 
 
