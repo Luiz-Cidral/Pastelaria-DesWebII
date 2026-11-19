@@ -123,8 +123,8 @@ onMounted(carregarCardapio)
       <ul>
         <li><RouterLink to="/#inicio">Início</RouterLink></li>
         <li class="atual"><RouterLink to="/cardapio">Cardápio</RouterLink></li>
-        <li><RouterLink to="/admin">Admin</RouterLink></li>
         <li><RouterLink to="/#sobre">Sobre</RouterLink></li>
+        <li><RouterLink to="/admin">Admin</RouterLink></li>
       </ul>
     </nav>
   </header>
@@ -209,6 +209,7 @@ onMounted(carregarCardapio)
 
   <footer class="rodape">Pastel Mania — feito com carinho.</footer>
 </template>
+
 
 
 

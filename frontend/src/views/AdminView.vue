@@ -111,6 +111,28 @@ async function carregarDados() {
   }
 }
 
+async function carregarPedidos() {
+  carregando.value = true
+  erro.value = ''
+
+  try {
+    const dados = await requisicao('/api/pedidos/?page_size=100')
+    pedidos.value = resultados(dados).map((pedido) => ({
+      ...pedido,
+      novoStatus: pedido.status,
+    }))
+  } catch (falha) {
+    erro.value = `Não foi possível carregar os pedidos: ${falha.message}`
+  } finally {
+    carregando.value = false
+  }
+}
+
+async function selecionarAba(nome) {
+  aba.value = nome
+  mensagem.value = ''
+  if (nome === 'pedidos' && usuario.value) await carregarPedidos()
+}
 async function verificarSessao() {
   carregando.value = true
   try {
@@ -332,9 +354,9 @@ onMounted(verificarSessao)
     </header>
 
     <nav class="admin-abas" aria-label="Seções administrativas">
-      <button :class="{ selecionada: aba === 'pratos' }" type="button" @click="aba = 'pratos'">Pratos</button>
-      <button :class="{ selecionada: aba === 'bebidas' }" type="button" @click="aba = 'bebidas'">Bebidas</button>
-      <button :class="{ selecionada: aba === 'pedidos' }" type="button" @click="aba = 'pedidos'">Pedidos</button>
+      <button :class="{ selecionada: aba === 'pratos' }" type="button" @click="selecionarAba('pratos')">Pratos</button>
+      <button :class="{ selecionada: aba === 'bebidas' }" type="button" @click="selecionarAba('bebidas')">Bebidas</button>
+      <button :class="{ selecionada: aba === 'pedidos' }" type="button" @click="selecionarAba('pedidos')">Pedidos</button>
     </nav>
 
     <p v-if="carregando" class="admin-mensagem">Carregando dados...</p>
@@ -443,7 +465,7 @@ onMounted(verificarSessao)
     <section v-if="aba === 'pedidos' && !carregando" class="admin-pedidos">
       <div class="admin-titulo-lista">
         <h2>Pedidos recebidos</h2>
-        <button class="botao-editar" type="button" @click="carregarDados">Atualizar lista</button>
+        <button class="botao-editar" type="button" @click="carregarPedidos">Atualizar lista</button>
       </div>
       <p v-if="pedidos.length === 0" class="admin-vazio">Ainda não há pedidos.</p>
       <article v-for="pedido in pedidos" :key="pedido.id" class="admin-pedido">
@@ -471,4 +493,5 @@ onMounted(verificarSessao)
     </section>
   </main>
 </template>
+
 

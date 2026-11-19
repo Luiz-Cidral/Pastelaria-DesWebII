@@ -101,7 +101,7 @@ class BebidaViewSet(ModelViewSet):
 
 
 class PedidoViewSet(ModelViewSet):
-    queryset = Pedido.objects.prefetch_related("itens__prato", "itens__bebida").all()
+    queryset = Pedido.objects.prefetch_related("itens__prato", "itens__bebida").order_by("-data", "-pk")
     serializer_class = PedidoSerializer
     permission_classes = (IsAdminOrCreateOrder,)
     http_method_names = ("get", "post", "patch", "head", "options")
@@ -112,3 +112,4 @@ class ItemPedidoViewSet(ModelViewSet):
     serializer_class = ItemPedidoSerializer
     permission_classes = (IsAdminUser,)
     http_method_names = ("get", "head", "options")
+
