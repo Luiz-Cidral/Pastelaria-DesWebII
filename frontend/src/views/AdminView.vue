@@ -17,6 +17,8 @@ const pratosFiltrados = computed(() => {
 const bebidas = ref([])
 const ingredientes = ref([])
 const pedidos = ref([])
+const carregandoPedidos = ref(false)
+const erroPedidos = ref('')
 const carregando = ref(false)
 const erro = ref('')
 const mensagem = ref('')
@@ -72,24 +74,37 @@ async function requisicao(url, opcoes = {}) {
     cabecalhos['X-CSRFToken'] = csrfToken.value
   }
 
-  const resposta = await fetch(url, {
-    ...opcoes,
-    headers: cabecalhos,
-    credentials: 'include',
-  })
+  const controle = new AbortController()
+  const limiteEspera = setTimeout(() => controle.abort(), 15000)
 
-  const texto = await resposta.text()
-  let dados = null
-  if (texto) {
-    try {
-      dados = JSON.parse(texto)
-    } catch {
-      dados = { detail: 'Resposta inválida do servidor.' }
+  try {
+    const resposta = await fetch(url, {
+      ...opcoes,
+      headers: cabecalhos,
+      credentials: 'include',
+      signal: controle.signal,
+    })
+    const texto = await resposta.text()
+    let dados = null
+
+    if (texto) {
+      try {
+        dados = JSON.parse(texto)
+      } catch {
+        dados = { detail: 'O servidor retornou uma resposta que não está em JSON.' }
+      }
     }
-  }
 
-  if (!resposta.ok) throw new Error(mensagemErro(dados))
-  return dados
+    if (!resposta.ok) throw new Error(mensagemErro(dados))
+    return dados
+  } catch (falha) {
+    if (falha.name === 'AbortError') {
+      throw new Error('A consulta demorou mais de 15 segundos. Confira se o Django está respondendo e tente novamente.')
+    }
+    throw falha
+  } finally {
+    clearTimeout(limiteEspera)
+  }
 }
 
 async function carregarTokenCSRF() {
@@ -102,20 +117,15 @@ async function carregarDados() {
   erro.value = ''
 
   try {
-    const [dadosPratos, dadosBebidas, dadosIngredientes, dadosPedidos] = await Promise.all([
+    const [dadosPratos, dadosBebidas, dadosIngredientes] = await Promise.all([
       requisicao('/api/pratos/?page_size=100'),
       requisicao('/api/bebidas/?page_size=100'),
       requisicao('/api/ingredientes/?page_size=100'),
-      requisicao('/api/pedidos/?page_size=100'),
     ])
 
     pratos.value = resultados(dadosPratos)
     bebidas.value = resultados(dadosBebidas)
     ingredientes.value = resultados(dadosIngredientes)
-    pedidos.value = resultados(dadosPedidos).map((pedido) => ({
-      ...pedido,
-      novoStatus: pedido.status,
-    }))
   } catch (falha) {
     erro.value = falha.message
   } finally {
@@ -124,19 +134,22 @@ async function carregarDados() {
 }
 
 async function carregarPedidos() {
-  carregando.value = true
-  erro.value = ''
+  carregandoPedidos.value = true
+  erroPedidos.value = ''
 
   try {
     const dados = await requisicao('/api/pedidos/?page_size=100')
-    pedidos.value = resultados(dados).map((pedido) => ({
-      ...pedido,
-      novoStatus: pedido.status,
-    }))
+    pedidos.value = resultados(dados)
+      .filter((pedido) => pedido && pedido.id !== undefined)
+      .map((pedido) => ({
+        ...pedido,
+        itens: Array.isArray(pedido.itens) ? pedido.itens : [],
+        novoStatus: pedido.status,
+      }))
   } catch (falha) {
-    erro.value = `Não foi possível carregar os pedidos: ${falha.message}`
+    erroPedidos.value = `Não foi possível carregar os pedidos: ${falha.message}`
   } finally {
-    carregando.value = false
+    carregandoPedidos.value = false
   }
 }
 
@@ -156,7 +169,8 @@ async function carregarIngredientes() {
 async function selecionarAba(nome) {
   aba.value = nome
   mensagem.value = ''
-  if (nome === 'pedidos' && usuario.value) await carregarPedidos()
+  erro.value = ''
+  if (nome === 'pedidos') await carregarPedidos()
   if (nome === 'ingredientes' && usuario.value) await carregarIngredientes()
 }
 async function verificarSessao() {
@@ -340,12 +354,24 @@ async function salvarIngrediente() {
   }
 }
 function nomeItemPedido(item) {
-  if (item.prato) return pratos.value.find((prato) => prato.id === item.prato)?.nome || 'Prato'
-  return bebidas.value.find((bebida) => bebida.id === item.bebida)?.nome || 'Bebida'
+  if (item.prato) {
+    const idPrato = typeof item.prato === 'object' ? item.prato.id : item.prato
+    return pratos.value.find((prato) => Number(prato.id) === Number(idPrato))?.nome || `Prato #${idPrato}`
+  }
+
+  const idBebida = typeof item.bebida === 'object' ? item.bebida.id : item.bebida
+  return bebidas.value.find((bebida) => Number(bebida.id) === Number(idBebida))?.nome || `Bebida #${idBebida}`
 }
 
 function totalPedido(pedido) {
   return pedido.itens.reduce((total, item) => total + Number(item.preco_unitario) * item.quantidade, 0)
+}
+
+function formatarPreco(valor) {
+  return Number(valor || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  })
 }
 
 function nomeStatus(status) {
@@ -417,7 +443,7 @@ onMounted(verificarSessao)
       <button :class="{ selecionada: aba === 'pedidos' }" type="button" @click="selecionarAba('pedidos')">Pedidos</button>
     </nav>
 
-    <p v-if="carregando" class="admin-mensagem">Carregando dados...</p>
+    <p v-if="carregando && aba !== 'pedidos'" class="admin-mensagem">Carregando dados...</p>
     <p v-if="erro" class="admin-mensagem erro-admin" role="alert">{{ erro }}</p>
     <p v-if="mensagem" class="admin-mensagem sucesso-admin" role="status">{{ mensagem }}</p>
 
@@ -557,39 +583,55 @@ onMounted(verificarSessao)
       </form>
     </section>
 
-    <section v-if="aba === 'pedidos' && !carregando" class="admin-pedidos">
+    <section v-if="aba === 'pedidos'" class="admin-pedidos">
       <div class="admin-titulo-lista">
-        <h2>Pedidos recebidos</h2>
-        <button class="botao-editar" type="button" @click="carregarPedidos">Atualizar lista</button>
+        <div>
+          <h2>Pedidos recebidos</h2>
+          <p class="admin-ajuda-estoque">{{ pedidos.length }} {{ pedidos.length === 1 ? 'pedido encontrado' : 'pedidos encontrados' }}</p>
+        </div>
+        <button class="botao-editar" type="button" :disabled="carregandoPedidos" @click="carregarPedidos">
+          {{ carregandoPedidos ? 'Atualizando...' : 'Atualizar lista' }}
+        </button>
       </div>
-      <p v-if="pedidos.length === 0" class="admin-vazio">Ainda não há pedidos.</p>
-      <article v-for="pedido in pedidos" :key="pedido.id" class="admin-pedido">
+
+      <p v-if="carregandoPedidos" class="admin-mensagem" role="status">Buscando pedidos na API...</p>
+      <div v-else-if="erroPedidos" class="admin-mensagem erro-admin" role="alert">
+        <p>{{ erroPedidos }}</p>
+        <div class="admin-acoes-topo">
+          <button class="botao-editar" type="button" @click="carregarPedidos">Tentar novamente</button>
+          <a class="admin-voltar" href="/api/pedidos/?page_size=100" target="_blank" rel="noreferrer">Ver resposta da API</a>
+        </div>
+      </div>
+      <p v-else-if="pedidos.length === 0" class="admin-vazio">Ainda não há pedidos registrados.</p>
+
+      <template v-else>
+        <article v-for="pedido in pedidos" :key="pedido.id" class="admin-pedido">
         <div class="admin-pedido-topo">
           <div>
             <strong>Pedido #{{ pedido.id }}</strong>
-            <span>{{ new Date(pedido.data).toLocaleString('pt-BR') }}</span>
+            <span>{{ pedido.data ? new Date(pedido.data).toLocaleString('pt-BR') : 'Data não informada' }}</span>
           </div>
           <strong>{{ formatarPreco(totalPedido(pedido)) }}</strong>
         </div>
-        <ul>
+        <ul v-if="pedido.itens.length">
           <li v-for="item in pedido.itens" :key="item.id">
-            {{ item.quantidade }} × {{ nomeItemPedido(item) }}
+            {{ item.quantidade }} × {{ nomeItemPedido(item) }} — {{ formatarPreco(Number(item.preco_unitario) * item.quantidade) }}
           </li>
         </ul>
+        <p v-else class="admin-vazio">Este pedido não possui itens informados.</p>
         <div class="admin-status-pedido">
           <span>Status atual: {{ nomeStatus(pedido.status) }}</span>
-          <select v-model="pedido.novoStatus" aria-label="Novo status do pedido">
+          <select v-model="pedido.novoStatus" :aria-label="`Novo status do pedido ${pedido.id}`">
             <option v-for="status in statusPedidos" :key="status.valor" :value="status.valor">{{ status.nome }}</option>
           </select>
           <button class="botao-editar" type="button" :disabled="pedido.novoStatus === pedido.status" @click="salvarStatus(pedido)">Salvar status</button>
           <small v-if="pedido.estoque_baixado">Estoque baixado</small>
-        </div>
-      </article>
+          </div>
+        </article>
+      </template>
     </section>
   </main>
 </template>
-
-
 
 
 
