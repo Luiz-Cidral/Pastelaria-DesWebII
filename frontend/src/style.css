@@ -900,6 +900,73 @@ nav ul {
     cursor: pointer;
 }
 
+.filtros-pedidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e3e9e2;
+}
+
+.filtro-pedido {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 7px 12px;
+    border: 1px solid #dce5dc;
+    border-radius: 20px;
+    background: white;
+    color: #44534a;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filtro-pedido span {
+    display: inline-grid;
+    min-width: 21px;
+    height: 21px;
+    place-items: center;
+    border-radius: 50%;
+    background: #edf3ec;
+    color: #31594d;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.filtro-pedido.selecionado {
+    border-color: #31594d;
+    background: #31594d;
+    color: white;
+}
+
+.filtro-pedido.selecionado span {
+    background: white;
+}
+
+.pedido-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 10px;
+    border-radius: 16px;
+    background: #edf3ec;
+    color: #31594d;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.pedido-status-em_preparo {
+    background: #edf2fa;
+    color: #3d5f8d;
+}
+
+.pedido-status-pronto {
+    background: #e5f3e8;
+    color: #27633b;
+}
+
 .admin-pedidos {
     display: grid;
     gap: 15px;
@@ -991,6 +1058,8 @@ nav ul {
         width: 100%;
     }
 }
+
+
 
 
 

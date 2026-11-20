@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const usuario = ref('')
@@ -17,6 +17,31 @@ const pratosFiltrados = computed(() => {
 const bebidas = ref([])
 const ingredientes = ref([])
 const pedidos = ref([])
+const filtroPedidos = ref('andamento')
+const opcoesFiltroPedidos = [
+  { valor: 'andamento', nome: 'Em andamento' },
+  { valor: 'pendente', nome: 'Pendentes' },
+  { valor: 'em_preparo', nome: 'Em preparo' },
+  { valor: 'pronto', nome: 'Prontos' },
+  { valor: 'entregue', nome: 'Entregues' },
+  { valor: 'cancelado', nome: 'Cancelados' },
+  { valor: 'todos', nome: 'Todos' },
+]
+const pedidosFiltrados = computed(() => {
+  if (filtroPedidos.value === 'todos') return pedidos.value
+  if (filtroPedidos.value === 'andamento') {
+    return pedidos.value.filter((pedido) => ['pendente', 'em_preparo', 'pronto'].includes(pedido.status))
+  }
+  return pedidos.value.filter((pedido) => pedido.status === filtroPedidos.value)
+})
+
+function contarPedidos(filtro) {
+  if (filtro === 'todos') return pedidos.value.length
+  if (filtro === 'andamento') {
+    return pedidos.value.filter((pedido) => ['pendente', 'em_preparo', 'pronto'].includes(pedido.status)).length
+  }
+  return pedidos.value.filter((pedido) => pedido.status === filtro).length
+}
 const carregandoPedidos = ref(false)
 const erroPedidos = ref('')
 const carregando = ref(false)
@@ -28,6 +53,8 @@ const formularioIngrediente = ref({})
 const salvandoPrato = ref(false)
 const salvandoBebida = ref(false)
 const salvandoIngrediente = ref(false)
+let estoqueSincronizando = false
+let intervaloEstoque = null
 
 const statusPedidos = [
   { valor: 'pendente', nome: 'Pendente' },
@@ -166,12 +193,30 @@ async function carregarIngredientes() {
     carregando.value = false
   }
 }
+async function sincronizarEstoque() {
+  if (!usuario.value || carregando.value || estoqueSincronizando) return
+
+  estoqueSincronizando = true
+  try {
+    const [dadosIngredientes, dadosBebidas] = await Promise.all([
+      requisicao('/api/ingredientes/?page_size=100'),
+      requisicao('/api/bebidas/?page_size=100'),
+    ])
+    ingredientes.value = resultados(dadosIngredientes)
+    bebidas.value = resultados(dadosBebidas)
+  } catch {
+    // A próxima sincronização automática tentará novamente.
+  } finally {
+    estoqueSincronizando = false
+  }
+}
 async function selecionarAba(nome) {
   aba.value = nome
   mensagem.value = ''
   erro.value = ''
   if (nome === 'pedidos') await carregarPedidos()
   if (nome === 'ingredientes' && usuario.value) await carregarIngredientes()
+  if (nome === 'bebidas' && usuario.value) await sincronizarEstoque()
 }
 async function verificarSessao() {
   carregando.value = true
@@ -388,6 +433,7 @@ async function salvarStatus(pedido) {
       body: JSON.stringify({ status: pedido.novoStatus }),
     })
     pedido.status = pedido.novoStatus
+    await sincronizarEstoque()
     mensagem.value = `Status do pedido #${pedido.id} atualizado para ${nomeStatus(pedido.status)}.`
   } catch (falha) {
     pedido.novoStatus = pedido.status
@@ -398,7 +444,16 @@ async function salvarStatus(pedido) {
 novoPrato()
 novaBebida()
 novoIngrediente()
-onMounted(verificarSessao)
+onMounted(() => {
+  verificarSessao()
+  intervaloEstoque = window.setInterval(() => {
+    if (aba.value === 'ingredientes' || aba.value === 'bebidas') sincronizarEstoque()
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (intervaloEstoque) window.clearInterval(intervaloEstoque)
+})
 </script>
 
 <template>
@@ -446,6 +501,7 @@ onMounted(verificarSessao)
     <p v-if="carregando && aba !== 'pedidos'" class="admin-mensagem">Carregando dados...</p>
     <p v-if="erro" class="admin-mensagem erro-admin" role="alert">{{ erro }}</p>
     <p v-if="mensagem" class="admin-mensagem sucesso-admin" role="status">{{ mensagem }}</p>
+    <p v-if="aba === 'ingredientes' || aba === 'bebidas'" class="admin-ajuda-estoque">Estoque sincronizado automaticamente enquanto esta aba estiver aberta.</p>
 
     <section v-if="aba === 'pratos' && !carregando" class="admin-layout">
       <div class="admin-lista">
@@ -587,7 +643,7 @@ onMounted(verificarSessao)
       <div class="admin-titulo-lista">
         <div>
           <h2>Pedidos recebidos</h2>
-          <p class="admin-ajuda-estoque">{{ pedidos.length }} {{ pedidos.length === 1 ? 'pedido encontrado' : 'pedidos encontrados' }}</p>
+          <p class="admin-ajuda-estoque">{{ pedidos.length }} {{ pedidos.length === 1 ? 'pedido no total' : 'pedidos no total' }}</p>
         </div>
         <button class="botao-editar" type="button" :disabled="carregandoPedidos" @click="carregarPedidos">
           {{ carregandoPedidos ? 'Atualizando...' : 'Atualizar lista' }}
@@ -602,36 +658,58 @@ onMounted(verificarSessao)
           <a class="admin-voltar" href="/api/pedidos/?page_size=100" target="_blank" rel="noreferrer">Ver resposta da API</a>
         </div>
       </div>
-      <p v-else-if="pedidos.length === 0" class="admin-vazio">Ainda não há pedidos registrados.</p>
-
       <template v-else>
-        <article v-for="pedido in pedidos" :key="pedido.id" class="admin-pedido">
-        <div class="admin-pedido-topo">
-          <div>
-            <strong>Pedido #{{ pedido.id }}</strong>
-            <span>{{ pedido.data ? new Date(pedido.data).toLocaleString('pt-BR') : 'Data não informada' }}</span>
-          </div>
-          <strong>{{ formatarPreco(totalPedido(pedido)) }}</strong>
-        </div>
-        <ul v-if="pedido.itens.length">
-          <li v-for="item in pedido.itens" :key="item.id">
-            {{ item.quantidade }} × {{ nomeItemPedido(item) }} — {{ formatarPreco(Number(item.preco_unitario) * item.quantidade) }}
-          </li>
-        </ul>
-        <p v-else class="admin-vazio">Este pedido não possui itens informados.</p>
-        <div class="admin-status-pedido">
-          <span>Status atual: {{ nomeStatus(pedido.status) }}</span>
-          <select v-model="pedido.novoStatus" :aria-label="`Novo status do pedido ${pedido.id}`">
-            <option v-for="status in statusPedidos" :key="status.valor" :value="status.valor">{{ status.nome }}</option>
-          </select>
-          <button class="botao-editar" type="button" :disabled="pedido.novoStatus === pedido.status" @click="salvarStatus(pedido)">Salvar status</button>
-          <small v-if="pedido.estoque_baixado">Estoque baixado</small>
-          </div>
-        </article>
+        <p v-if="pedidos.length === 0" class="admin-vazio">Ainda não há pedidos registrados.</p>
+        <template v-else>
+          <nav class="filtros-pedidos" aria-label="Filtrar pedidos por status">
+            <button
+              v-for="filtro in opcoesFiltroPedidos"
+              :key="filtro.valor"
+              type="button"
+              :class="['filtro-pedido', { selecionado: filtroPedidos === filtro.valor }]"
+              :aria-pressed="filtroPedidos === filtro.valor"
+              @click="filtroPedidos = filtro.valor"
+            >
+              {{ filtro.nome }} <span>{{ contarPedidos(filtro.valor) }}</span>
+            </button>
+          </nav>
+          <p v-if="pedidosFiltrados.length === 0" class="admin-vazio">Nenhum pedido nesta situação.</p>
+          <article
+            v-for="pedido in pedidosFiltrados"
+            :key="pedido.id"
+            class="admin-pedido"
+          >
+            <div class="admin-pedido-topo">
+              <div>
+                <strong>Pedido #{{ pedido.id }}</strong>
+                <span>{{ pedido.data ? new Date(pedido.data).toLocaleString('pt-BR') : 'Data não informada' }}</span>
+              </div>
+              <strong>{{ formatarPreco(totalPedido(pedido)) }}</strong>
+            </div>
+            <ul v-if="pedido.itens.length">
+              <li v-for="item in pedido.itens" :key="item.id">
+                {{ item.quantidade }} × {{ nomeItemPedido(item) }} — {{ formatarPreco(Number(item.preco_unitario) * item.quantidade) }}
+              </li>
+            </ul>
+            <p v-else class="admin-vazio">Este pedido não possui itens informados.</p>
+            <div class="admin-status-pedido">
+              <span :class="['pedido-status', `pedido-status-${pedido.status}`]">{{ nomeStatus(pedido.status) }}</span>
+              <select v-model="pedido.novoStatus" :aria-label="`Novo status do pedido ${pedido.id}`">
+                <option v-for="status in statusPedidos" :key="status.valor" :value="status.valor">{{ status.nome }}</option>
+              </select>
+              <button class="botao-editar" type="button" :disabled="pedido.novoStatus === pedido.status" @click="salvarStatus(pedido)">Salvar status</button>
+              <small v-if="pedido.estoque_baixado">Estoque baixado</small>
+            </div>
+          </article>
+        </template>
       </template>
     </section>
   </main>
 </template>
+
+
+
+
 
 
 
