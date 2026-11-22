@@ -19,10 +19,11 @@ class BebidaFilter(filters.FilterSet):
     preco_maximo = filters.NumberFilter(field_name="preco", lookup_expr="lte")
     estoque_minimo = filters.NumberFilter(field_name="estoque", lookup_expr="gte")
     estoque_maximo = filters.NumberFilter(field_name="estoque", lookup_expr="lte")
+    disponivel = filters.BooleanFilter(field_name="disponivel")
 
     class Meta:
         model = Bebida
-        fields = ("preco_minimo", "preco_maximo", "estoque_minimo", "estoque_maximo")
+        fields = ("preco_minimo", "preco_maximo", "estoque_minimo", "estoque_maximo", "disponivel")
 
 
 class IngredienteFilter(filters.FilterSet):
@@ -32,3 +33,4 @@ class IngredienteFilter(filters.FilterSet):
     class Meta:
         model = Ingrediente
         fields = ("estoque_minimo", "estoque_maximo")
+

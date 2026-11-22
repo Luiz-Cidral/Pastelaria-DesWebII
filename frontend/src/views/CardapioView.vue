@@ -21,7 +21,7 @@ async function carregarCardapio() {
   erro.value = ''
 
   const parametrosPratos = new URLSearchParams({ page_size: '100', ordering: ordenacao.value })
-  const parametrosBebidas = new URLSearchParams({ page_size: '100', estoque_minimo: '1', ordering: ordenacao.value })
+  const parametrosBebidas = new URLSearchParams({ page_size: '100', ordering: ordenacao.value })
   if (busca.value.trim()) {
     parametrosPratos.set('search', busca.value.trim())
     parametrosBebidas.set('search', busca.value.trim())
@@ -61,6 +61,7 @@ function alterarQuantidade(tipo, produto, alteracao) {
 
   if (novaQuantidade < 0) return
   if (tipo === 'prato' && !produto.disponivel) return
+  if (tipo === 'bebida' && alteracao > 0 && (!produto.disponivel || produto.estoque === 0)) return
   if (tipo === 'bebida' && novaQuantidade > produto.estoque) return
 
   const itemExistente = carrinho.value.find((item) => item.tipo === tipo && item.produto.id === produto.id)
@@ -239,12 +240,13 @@ watch(
               <div class="produto-informacoes">
                 <span class="produto-categoria">Bebida</span>
                 <h3>{{ bebida.nome }}</h3>
-                <p>{{ bebida.estoque > 0 ? `${bebida.estoque} disponíveis` : 'Fora de estoque' }}</p>
+                <p>{{ bebida.estoque }} em estoque</p>
                 <strong>{{ formatarPreco(bebida.preco) }}</strong>
+                <span v-if="!bebida.disponivel || bebida.estoque === 0" class="produto-indisponivel">Indisponível</span>
                 <div class="controle-quantidade">
                   <button type="button" :disabled="quantidadeSelecionada('bebida', bebida) === 0" @click="alterarQuantidade('bebida', bebida, -1)">−</button>
                   <span>{{ quantidadeSelecionada('bebida', bebida) }}</span>
-                  <button type="button" :disabled="bebida.estoque === 0 || quantidadeSelecionada('bebida', bebida) >= bebida.estoque" @click="alterarQuantidade('bebida', bebida, 1)">+</button>
+                  <button type="button" :disabled="!bebida.disponivel || bebida.estoque === 0 || quantidadeSelecionada('bebida', bebida) >= bebida.estoque" @click="alterarQuantidade('bebida', bebida, 1)">+</button>
                 </div>
               </div>
             </article>
@@ -277,6 +279,10 @@ watch(
 
   <footer class="rodape">Pastel Mania — feito com carinho.</footer>
 </template>
+
+
+
+
 
 
 

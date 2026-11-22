@@ -81,7 +81,7 @@ function novoIngrediente() {
 }
 
 function novaBebida() {
-  formularioBebida.value = { id: null, nome: '', preco: '', estoque: 0 }
+  formularioBebida.value = { id: null, nome: '', preco: '', estoque: 0, disponivel: false }
 }
 
 function resultados(dados) {
@@ -352,6 +352,7 @@ async function salvarBebida() {
       nome: bebida.nome,
       preco: Number(bebida.preco),
       estoque: Number(bebida.estoque),
+      disponivel: Boolean(bebida.disponivel),
     }
     const url = bebida.id ? `/api/bebidas/${bebida.id}/` : '/api/bebidas/'
     await requisicao(url, {
@@ -616,7 +617,7 @@ onUnmounted(() => {
         <article v-for="bebida in bebidas" :key="bebida.id" class="admin-registro">
           <div>
             <strong>{{ bebida.nome }}</strong>
-            <span>{{ bebida.estoque }} em estoque</span>
+            <span>{{ bebida.estoque }} em estoque · {{ bebida.disponivel ? 'Disponível' : 'Indisponível' }}</span>
           </div>
           <button class="botao-editar" type="button" @click="editarBebida(bebida)">Editar</button>
         </article>
@@ -630,6 +631,7 @@ onUnmounted(() => {
         <input id="bebida-preco" v-model="formularioBebida.preco" type="number" min="0.01" step="0.01" required />
         <label for="bebida-estoque">Unidades em estoque</label>
         <input id="bebida-estoque" v-model="formularioBebida.estoque" type="number" min="0" step="1" required />
+        <label class="admin-checkbox"><input v-model="formularioBebida.disponivel" type="checkbox" /> Disponível para pedidos</label>
         <div class="admin-botoes-formulario">
           <button class="botao botao-salvar" type="submit" :disabled="salvandoBebida">
             {{ salvandoBebida ? 'Salvando...' : 'Salvar bebida' }}

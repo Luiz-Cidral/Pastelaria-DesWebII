@@ -102,7 +102,14 @@ class PratoSerializer(serializers.ModelSerializer):
 class BebidaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bebida
-        fields = ("id", "nome", "preco", "estoque")
+        fields = ("id", "nome", "preco", "estoque", "disponivel")
+
+    def validate(self, attrs):
+        estoque = attrs.get("estoque", self.instance.estoque if self.instance else 0)
+        disponivel = attrs.get("disponivel")
+        if disponivel is True and estoque == 0:
+            raise serializers.ValidationError({"disponivel": "Informe um estoque maior que zero para disponibilizar a bebida."})
+        return attrs
 
     def validate_nome(self, value):
         nome_limpo = value.strip()
@@ -139,6 +146,8 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Informe exatamente um produto: prato ou bebida.")
         if prato is not None and not prato.disponivel:
             raise serializers.ValidationError({"prato": "Este prato está indisponível no momento."})
+        if bebida is not None and not bebida.disponivel:
+            raise serializers.ValidationError({"bebida": "Esta bebida está indisponível no momento."})
         return attrs
 
 
@@ -195,5 +204,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             except DjangoValidationError as exc:
                 raise serializers.ValidationError(exc.message_dict if hasattr(exc, "message_dict") else exc.messages) from exc
         return pedido
+
+
 
 

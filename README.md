@@ -6,7 +6,7 @@ O backend foi feito com Django e Django REST Framework. As páginas do cliente e
 
 ## Funcionalidades
 
-- Ver pratos e bebidas disponíveis.
+- Ver pratos e bebidas, inclusive quando estiverem indisponíveis.
 - Pesquisar, filtrar e ordenar os itens do cardápio.
 - Criar pedidos com pratos, bebidas ou ambos.
 - Cadastrar e editar pratos, bebidas e ingredientes no painel administrativo.
@@ -119,7 +119,7 @@ Parâmetros disponíveis para pratos:
 - `ordering`: ordena por `nome` ou `preco`. Use `-preco` para mostrar os maiores preços primeiro.
 - `page` e `page_size`: escolhem a página e a quantidade de itens. O limite é 100 itens por página.
 
-Bebidas também aceitam `preco_minimo`, `preco_maximo`, `estoque_minimo` e `estoque_maximo`. Ingredientes aceitam `estoque_minimo` e `estoque_maximo`. Os três recursos permitem busca textual e ordenação por seus campos disponíveis.
+Bebidas também aceitam `disponivel=true` ou `disponivel=false`, além de `preco_minimo`, `preco_maximo`, `estoque_minimo` e `estoque_maximo`. Bebidas indisponíveis continuam no cardápio com um aviso e não podem ser adicionadas ao pedido. Ingredientes aceitam `estoque_minimo` e `estoque_maximo`. Os três recursos permitem busca textual e ordenação por seus campos disponíveis.
 
 ## Pedidos e estoque
 
@@ -136,7 +136,7 @@ Um pedido pode conter pratos e bebidas. Cada item deve ter um produto e uma quan
 
 O pedido começa com status `pendente`. O preço é obtido do cadastro do produto, portanto não deve ser enviado pelo cliente. A equipe pode alterar o status para `em_preparo`, `pronto`, `entregue` ou `cancelado`.
 
-Quando o pedido passa para `pronto`, o sistema verifica se há estoque suficiente de bebidas e dos ingredientes usados nos pratos. Se faltar estoque, o pedido não é concluído e nenhuma quantidade é descontada parcialmente. A baixa acontece apenas uma vez por pedido.
+Quando o pedido passa para `pronto`, o sistema verifica se há estoque suficiente de bebidas e dos ingredientes usados nos pratos. Se faltar estoque, o pedido não é concluído e nenhuma quantidade é descontada parcialmente. A baixa acontece apenas uma vez por pedido. Quando o estoque de uma bebida chega a zero, ela continua visível no cardápio como indisponível; depois de repor o estoque, a equipe pode marcá-la como disponível novamente.
 
 Se o estoque de um ingrediente ficar abaixo da quantidade necessária para a receita de um prato, o sistema marca o prato como indisponível.
 

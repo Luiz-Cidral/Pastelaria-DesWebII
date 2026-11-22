@@ -41,9 +41,9 @@ class IngredienteAdmin(admin.ModelAdmin):
 
 @admin.register(Bebida)
 class BebidaAdmin(admin.ModelAdmin):
-    list_display = ("id", "nome", "preco", "estoque")
+    list_display = ("id", "nome", "preco", "estoque", "disponivel")
     search_fields = ("nome",)
-    list_filter = ("estoque",)
+    list_filter = ("disponivel", "estoque")
 
 
 @admin.register(Pedido)
@@ -57,3 +57,4 @@ class PedidoAdmin(admin.ModelAdmin):
         super().save_related(request, form, formsets, change)
         if form.instance.status == Pedido.Status.PRONTO:
             baixar_estoque_pedido(form.instance)
+

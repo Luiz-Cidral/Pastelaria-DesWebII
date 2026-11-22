@@ -45,6 +45,7 @@ class Bebida(models.Model):
     nome = models.CharField(max_length=100)
     preco = models.DecimalField(max_digits=8, decimal_places=2)
     estoque = models.IntegerField(default=0)
+    disponivel = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.nome} - R$ {self.preco}"
@@ -86,5 +87,6 @@ class ItemPedido(models.Model):
     def __str__(self):
         produto = self.prato or self.bebida
         return f"{self.quantidade} x {produto} no pedido #{self.pedido_id}"
+
 
 
