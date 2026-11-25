@@ -215,10 +215,33 @@ nav a:hover,
 /* ---------- RODAPÉ ---------- */
 
 .rodape {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     padding: 20px;
     background: #31594d;
     color: white;
     text-align: center;
+}
+
+.rodape-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.rodape-github:hover {
+    text-decoration: underline;
+}
+
+.rodape-github img {
+    width: 22px;
+    height: 22px;
+    filter: invert(1);
 }
 
 /* ---------- RESPONSIVO ---------- */

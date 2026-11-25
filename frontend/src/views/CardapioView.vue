@@ -277,7 +277,7 @@ watch(
     </div>
   </main>
 
-  <footer class="rodape">Pastel Mania — feito com carinho.</footer>
+  <footer class="rodape">Pastel Mania — feito com carinho.<a class="rodape-github" href="https://github.com/Luiz-Cidral/Pastelaria-DesWebII" target="_blank" rel="noopener noreferrer"><img src="/github.svg" alt="" aria-hidden="true" /><span>GitHub</span></a></footer>
 </template>
 
 
