@@ -809,6 +809,25 @@ nav ul {
     font-size: 21px;
 }
 
+.botao-excluir {
+    padding: 9px 13px;
+    border: 1px solid #e4c7c3;
+    border-radius: 7px;
+    background: white;
+    color: #9b3d34;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.botao-excluir:hover:not(:disabled) {
+    background: #fff3f1;
+}
+
+.botao-excluir:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
 .botao-pequeno {
     padding: 9px 12px;
     font-size: 13px;
@@ -823,6 +842,13 @@ nav ul {
     color: #31594d;
     font: inherit;
 }
+.admin-registro .admin-acoes-registro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .admin-registro {
     display: flex;
     align-items: center;

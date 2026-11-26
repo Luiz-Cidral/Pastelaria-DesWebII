@@ -53,6 +53,7 @@ const formularioIngrediente = ref({})
 const salvandoPrato = ref(false)
 const salvandoBebida = ref(false)
 const salvandoIngrediente = ref(false)
+const excluindo = ref('')
 let estoqueSincronizando = false
 let intervaloEstoque = null
 
@@ -96,8 +97,9 @@ function mensagemErro(dados) {
 
 async function requisicao(url, opcoes = {}) {
   const cabecalhos = { ...(opcoes.headers || {}) }
-  if (opcoes.body) {
-    cabecalhos['Content-Type'] = 'application/json'
+  const metodo = (opcoes.method || 'GET').toUpperCase()
+  if (opcoes.body) cabecalhos['Content-Type'] = 'application/json'
+  if (!['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(metodo)) {
     cabecalhos['X-CSRFToken'] = csrfToken.value
   }
 
@@ -264,6 +266,43 @@ async function sair() {
     usuario.value = ''
     mensagem.value = ''
     erro.value = ''
+  }
+}
+
+async function excluirRegistro(tipo, registro) {
+  const nomes = {
+    prato: 'este prato',
+    bebida: 'esta bebida',
+    ingrediente: 'este ingrediente',
+  }
+  const colecoes = {
+    prato: { url: '/api/pratos/', registros: pratos },
+    bebida: { url: '/api/bebidas/', registros: bebidas },
+    ingrediente: { url: '/api/ingredientes/', registros: ingredientes },
+  }
+  const nome = nomes[tipo]
+  const chave = `${tipo}-${registro.id}`
+
+  if (!window.confirm(`Tem certeza que deseja excluir ${nome} "${registro.nome}"? Esta ação não pode ser desfeita.`)) return
+
+  erro.value = ''
+  mensagem.value = ''
+  excluindo.value = chave
+
+  try {
+    await requisicao(`${colecoes[tipo].url}${registro.id}/`, { method: 'DELETE' })
+    colecoes[tipo].registros.value = colecoes[tipo].registros.value.filter((item) => item.id !== registro.id)
+
+    if (tipo === 'prato' && formularioPrato.value.id === registro.id) novoPrato()
+    if (tipo === 'bebida' && formularioBebida.value.id === registro.id) novaBebida()
+    if (tipo === 'ingrediente' && formularioIngrediente.value.id === registro.id) novoIngrediente()
+
+    const nomesSucesso = { prato: 'Prato', bebida: 'Bebida', ingrediente: 'Ingrediente' }
+    mensagem.value = tipo === 'bebida' ? 'Bebida excluída com sucesso.' : `${nomesSucesso[tipo]} excluído com sucesso.`
+  } catch (falha) {
+    erro.value = `Não foi possível excluir ${nome}. Ele pode estar associado a uma receita ou a um pedido. ${falha.message}`
+  } finally {
+    excluindo.value = ''
   }
 }
 
@@ -520,7 +559,17 @@ onUnmounted(() => {
             <strong>{{ prato.nome }}</strong>
             <span>{{ prato.categoria }} · {{ prato.disponivel ? 'Disponível' : 'Indisponível' }}</span>
           </div>
-          <button class="botao-editar" type="button" @click="editarPrato(prato)">Editar</button>
+          <div class="admin-acoes-registro">
+            <button class="botao-editar" type="button" @click="editarPrato(prato)">Editar</button>
+            <button
+              class="botao-excluir"
+              type="button"
+              :disabled="excluindo === 'prato-' + prato.id"
+              @click="excluirRegistro('prato', prato)"
+            >
+              {{ excluindo === 'prato-' + prato.id ? 'Excluindo...' : 'Excluir' }}
+            </button>
+          </div>
         </article>
         <p v-if="pratosFiltrados.length === 0" class="admin-vazio">Nenhum prato corresponde a este filtro.</p>
       </div>
@@ -588,7 +637,17 @@ onUnmounted(() => {
             <strong>{{ ingrediente.nome }}</strong>
             <span>{{ ingrediente.estoque }} g em estoque</span>
           </div>
-          <button class="botao-editar" type="button" @click="editarIngrediente(ingrediente)">Editar estoque</button>
+          <div class="admin-acoes-registro">
+            <button class="botao-editar" type="button" @click="editarIngrediente(ingrediente)">Editar estoque</button>
+            <button
+              class="botao-excluir"
+              type="button"
+              :disabled="excluindo === 'ingrediente-' + ingrediente.id"
+              @click="excluirRegistro('ingrediente', ingrediente)"
+            >
+              {{ excluindo === 'ingrediente-' + ingrediente.id ? 'Excluindo...' : 'Excluir' }}
+            </button>
+          </div>
         </article>
         <p v-if="ingredientes.length === 0" class="admin-vazio">Nenhum ingrediente cadastrado.</p>
       </div>
@@ -619,7 +678,17 @@ onUnmounted(() => {
             <strong>{{ bebida.nome }}</strong>
             <span>{{ bebida.estoque }} em estoque · {{ bebida.disponivel ? 'Disponível' : 'Indisponível' }}</span>
           </div>
-          <button class="botao-editar" type="button" @click="editarBebida(bebida)">Editar</button>
+          <div class="admin-acoes-registro">
+            <button class="botao-editar" type="button" @click="editarBebida(bebida)">Editar</button>
+            <button
+              class="botao-excluir"
+              type="button"
+              :disabled="excluindo === 'bebida-' + bebida.id"
+              @click="excluirRegistro('bebida', bebida)"
+            >
+              {{ excluindo === 'bebida-' + bebida.id ? 'Excluindo...' : 'Excluir' }}
+            </button>
+          </div>
         </article>
       </div>
 
